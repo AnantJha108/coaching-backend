@@ -1,7 +1,8 @@
 <?php
 
 use App\Http\Controllers\AuthController;
-use App\Models\User;
+use App\Http\Controllers\StudentController;
+use App\Http\Controllers\CourseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -22,3 +23,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('/register',[AuthController::class,"register"]);
 Route::post('/login',[AuthController::class,"login"]);
+Route::get('/students',[StudentController::class,"index"]);
+Route::post('/students/store',[StudentController::class,"store"]);
+Route::post('/courses/store',[CourseController::class,"store"]);
+// Route::apiResource('students',StudentController::class);

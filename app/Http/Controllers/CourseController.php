@@ -36,6 +36,9 @@ class CourseController extends Controller
             'discount_fees' => 'required',
             'description' => 'required',
         ]);
+        // $filename = $request->image->getClientOriginalName();
+        // $request->image->move(public_path('images'), $filename);
+        // $data['image'] = $filename;
         if($data->fails()){
             return response()->json(["msg" => $data->errors()], 200);
         }

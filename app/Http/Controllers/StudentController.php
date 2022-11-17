@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class StudentController extends Controller
 {
@@ -26,7 +27,7 @@ class StudentController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $data = Validator::make($request->all(),[
             'user_id' => 'required',
             'contact' => 'required',
             'address' => 'required',
@@ -36,8 +37,14 @@ class StudentController extends Controller
             'education' => 'required',
             'dob' => 'required',
         ]);
-        Student::create($data);
-        return response()->json($data,200);
+        if($data->fails()){
+            return response()->json(["msg" => $data->errors()], 200);
+        }
+        else{
+            $student =  Student::create($data->validated());
+            return response()->json($student,200);
+        }
+    
     }
 
     /**
@@ -58,9 +65,33 @@ class StudentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Student $s)
     {
-        //
+        $data = Validator::make($request->all(),[
+            'user_id' => 'required',
+            'contact' => 'required',
+            'address' => 'required',
+            'gender' => 'required',
+            'city' => 'required',
+            'state' => 'required',
+            'education' => 'required',
+            'dob' => 'required',
+        ]);
+        if($data->fails()){
+            return response()->json(["msg" => $data->errors()], 200);
+        }
+        else{
+            $s->user_id = $request->user_id;
+            $s->contact = $request->contact;
+            $s->address = $request->address;
+            $s->gender = $request->gender;
+            $s->city = $request->city;
+            $s->state = $request->state;
+            $s->education = $request->education;
+            $s->dob = $request->dob;
+            $s->save();
+            return response()->json($s,200);
+        }
     }
 
     /**
@@ -69,8 +100,10 @@ class StudentController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Student $s)
     {
-        //
+        $s->delete();
+        $student['data'] = $s;
+         return response()->json([$student,'msg'=>'Data deleted successfull']);
     }
 }

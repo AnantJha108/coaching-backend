@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Course;
+use App\Models\Student;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class CourseController extends Controller
 {
@@ -14,7 +16,8 @@ class CourseController extends Controller
      */
     public function index()
     {
-        //
+        $data['courses'] = Course::all();
+        return response()->json($data,200);
     }
 
     /**
@@ -25,16 +28,24 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
+        $data = Validator::make($request->all(),[
             'title' => 'required',
             'duration' => 'required',
-            'image' => 'required|image',
+            // 'image' => 'required|image',
             'fees' => 'required',
             'discount_fees' => 'required',
             'description' => 'required',
         ]);
-        Course::create($data);
-        return response()->json($data,200);
+        if($data->fails()){
+            return response()->json(["msg" => $data->errors()], 200);
+        }
+        else{
+            $course =  Course::create($data->validated());
+            return response()->json([
+                "msg" => "Course Added", 
+                "insertedData"  => $course
+            ], 200);
+        }
     }
 
     /**
@@ -55,9 +66,29 @@ class CourseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Course $c)
     {
-        //
+        $data = Validator::make($request->all(),[
+            'title' => 'required',
+            'duration' => 'required',
+            // 'image' => 'required|image',
+            'fees' => 'required',
+            'discount_fees' => 'required',
+            'description' => 'required',
+        ]);
+        if($data->fails()){
+            return response()->json(["msg" => $data->errors()], 200);
+        }
+        else{
+            $c->title = $request->title;
+            $c->duration = $request->duration;
+            $c->fees = $request->fees;
+            $c->discount_fees = $request->discount_fees;
+            $c->description = $request->description;
+            $c->save();
+            return response()->json([$c,"msg" => "Course Updated"
+            ], 200);
+        }
     }
 
     /**
@@ -66,8 +97,10 @@ class CourseController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Course $c)
     {
-        //
+        $c->delete();
+        $course['data'] = $c;
+        return response()->json([$course,'msg'=>'Data deleted successfull']);
     }
 }
